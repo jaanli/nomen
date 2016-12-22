@@ -19,6 +19,8 @@ cfg = nomen.Config()
 cfg.define_float('learning_rate', 0.5, 'This is the learning rate')
 with cfg.scope('model'):
   cfg.define_float('name', 'bob', 'Name of the model')
+
+# Parse any command line flags, otherwise set values to defaults
 cfg.parse_args()
 
 # Hierarchical option parsing means it will search one level higher
