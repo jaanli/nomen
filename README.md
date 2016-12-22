@@ -12,6 +12,7 @@ pip install nomen
 
 ### Usage
 ```
+# main.py
 import nomen
 
 cfg = nomen.Config()
@@ -23,6 +24,8 @@ cfg.parse_args()
 # Hierarchical option parsing means it will search one level higher
 if the key is not found in the leaf node
 print cfg['model/learning_rate']
+
+# Options can be set via the command line, e.g. `python main.py --model/learning_rate 0.01`
 
 # Get only part of the option tree
 print cfg['model']
