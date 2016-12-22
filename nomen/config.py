@@ -183,34 +183,3 @@ class Config(object):
     """
     arg_name = self._path(arg_name)
     self._set_value(arg_name, default_value)
-
-
-
-def main():
-  # run tests
-  cfg = Config()
-  cfg.define_float('learning_rate', 0.5, 'docstring')
-  cfg.define_integer('hidden_size', 200, 'hidden')
-  cfg.define_float('model/learning_rate', 0.8, 'docstr')
-  with cfg.scope('variational'):
-    cfg.define_float('learning_rate', 2., 'learning rate for variational')
-  cfg.parse_args()
-  # test getting
-  print cfg
-  print cfg['variational/hidden_size']
-  print cfg['hidden_size']
-  print cfg['variational']
-  print 'variational learning rate', cfg['variational/learning_rate']
-  with cfg.scope('variational'):
-    print cfg['learning_rate']
-
-  # test loading
-  cfg['variational'].update({'learning_rate': 0.08})
-  print cfg['variational']
-  dct = {'learning_rate': 0.00001, 'variational': {'learning_rate': '0.01'}}
-  cfg.update(dct)
-  print cfg
-
-
-if __name__ == '__main__':
-  main()
