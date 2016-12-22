@@ -47,7 +47,6 @@ CLASSIFIERS  = (
 PROJECT      = os.path.abspath(os.path.dirname(__file__))
 REQUIRE_PATH = "requirements.txt"
 VERSION_PATH = os.path.join(PACKAGE, "version.py")
-PKG_DESCRIBE = "DESCRIPTION.txt"
 
 ## Directories to ignore in find_packages
 EXCLUDES     = (
@@ -95,7 +94,7 @@ config = {
     "name": NAME,
     "version": get_version(),
     "description": DESCRIPTION,
-    "long_description": read(PKG_DESCRIBE),
+    "long_description": DESCRIPTION,
     "license": LICENSE,
     "author": AUTHOR,
     "author_email": EMAIL,
