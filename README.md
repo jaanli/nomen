@@ -40,4 +40,4 @@ with open('options.cfg', 'wb') as f:
 ```
 
 ### Contributing
-Please help
+Pull requests and issues welcome. Please help
