@@ -3,4 +3,4 @@
 # 2) we can import it in setup.py for the same reason
 # 3) we can import it into your module module
 def get_version():
-  return '0.1'
+  return '0.2'
