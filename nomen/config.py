@@ -115,7 +115,7 @@ class Config(object):
       self._set_value(arg_name, val)
     self.parsed = True
     self._tree = _default_to_regular(self._tree)
-    if unparsed:
+    if unparsed and unparsed != ['test']:
       raise Warning('Unparsed args: %s' % unparsed)
 
   def define_string(self, arg_name, default_value, docstring):

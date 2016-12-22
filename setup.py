@@ -8,4 +8,9 @@ setup(name='nomen',
       author_email='j@jaan.io',
       license='MIT',
       packages=['nomen'],
+      install_requires=[
+          'markdown',
+      ],
+      test_suite='nose.collector',
+      tests_require=['nose'],
       zip_safe=False)
