@@ -1,7 +1,7 @@
 # nomen
 Lightweight configuration with command line flags.
 
-The goal of this package is to subsume tensorflow flags. One time I wrote forty five bugs using the tf.app.flags module, so I knew things had to change.
+[Nomen](https://en.wikipedia.org/wiki/Nomen_nudum) or _nomen nudum_ means _naked name_ in taxonomy. The goal of this package is to provide transparent configuration and command line flags.
 
 Hence, it is heavily based on [TensorFlow's flags](https://github.com/tensorflow/tensorflow/blob/ad5a583e7b9f095d1d0151fd24f9e5055d5dd6ab/tensorflow/python/platform/flags.py).
 
@@ -38,3 +38,5 @@ with open('options.cfg', 'wb') as f:
 
 ### Contributing
 Please help
+
+Historical note: One time I wrote forty five bugs using the tf.app.flags module, but I also had sleep apnea back then.
