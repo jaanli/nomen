@@ -41,5 +41,8 @@ with open('options.cfg', 'wb') as f:
   json.dump(cfg.json, f, indent=2)
 ```
 
+### Acknowledgments
+Many thanks to Rajesh - this is his idea and I've found it very useful.
+
 ### Contributing
 Pull requests and issues welcome. Please help
