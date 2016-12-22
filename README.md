@@ -41,5 +41,3 @@ with open('options.cfg', 'wb') as f:
 
 ### Contributing
 Please help
-
-Historical note: One time I wrote forty five bugs using the tf.app.flags module, but I also had sleep apnea back then.
