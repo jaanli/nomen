@@ -45,7 +45,6 @@ CLASSIFIERS  = (
 
 ## Important Paths
 PROJECT      = os.path.abspath(os.path.dirname(__file__))
-REQUIRE_PATH = "requirements.txt"
 VERSION_PATH = os.path.join(PACKAGE, "version.py")
 
 ## Directories to ignore in find_packages
@@ -76,16 +75,6 @@ def get_version(path=VERSION_PATH):
     return namespace['get_version']()
 
 
-def get_requires(path=REQUIRE_PATH):
-    """
-    Yields a generator of requirements as defined by the REQUIRE_PATH which
-    should point to a requirements.txt output by `pip freeze`.
-    """
-    for line in read(path).splitlines():
-        line = line.strip()
-        if line and not line.startswith('#'):
-            yield line
-
 ##########################################################################
 ## Define the configuration
 ##########################################################################
@@ -103,7 +92,6 @@ config = {
     "url": REPOSITORY,
     "download_url": "{}/tarball/v{}".format(REPOSITORY, get_version()),
     "packages": find_packages(where=PROJECT, exclude=EXCLUDES),
-    "install_requires": list(get_requires()),
     "classifiers": CLASSIFIERS,
     "keywords": KEYWORDS,
     "zip_safe": False,
