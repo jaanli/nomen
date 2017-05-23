@@ -52,6 +52,9 @@ EXCLUDES = (
     "tests", "bin", "docs", "fixtures", "register", "notebooks",
 )
 
+## Requirements
+REQUIREMENTS = ["pyyaml"]
+
 ##########################################################################
 ## Helper Functions
 ##########################################################################
@@ -96,6 +99,7 @@ config = {
     "classifiers": CLASSIFIERS,
     "keywords": KEYWORDS,
     "zip_safe": False,
+    "install_requires": REQUIREMENTS,
 }
 
 ##########################################################################
