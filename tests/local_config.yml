@@ -1,0 +1,7 @@
+model:
+  learning_rate: 0.232
+variational:
+  learning_rate: 0.3
+
+log: $LOG
+

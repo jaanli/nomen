@@ -41,8 +41,36 @@ with open('options.cfg', 'wb') as f:
   json.dump(cfg.json, f, indent=2)
 ```
 
+### Testing
+```
+# create a symbolic link to the package for testing
+pip install -e i
+# run all the tests
+pytest
+```
+
+### Pushing to pypi
+```
+# build the package, possibly with a new version.py
+python setup.py sdist bdist_wheel
+# test the built package
+pip install -i https://testpypi.python.org/pypi nomen
+# upload to pypi
+twine upload dist/*
+# test again
+pip install nomen --no-cache-dir
+```
+
+
 ### Acknowledgments
-Many thanks to Rajesh - this is his idea and I've found it very useful.
+Many thanks to Rajesh - this is based around his advice and ideas, which I've found it very useful.
 
 ### Contributing
 Pull requests and issues welcome. Please help
+
+### Wishlist / todo
+* do not subclass from dict for pathdict
+* when indexing subtree, return a pathdict!
+* think about jinja2 templates? i.e. to merge multiple files? e.g. << ./global_config.yml
+* make global options work?
+* be able to iterate through dict?

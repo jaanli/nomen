@@ -1,185 +1,120 @@
-"""Configuration class that includes command line arguments."""
-import contextlib
+import yaml
+from .path_dict import PathDict
+import os
 import argparse
-import json
+import itertools
 import collections
 import copy
+import json
 
 
 _GLOBAL_PARSER = argparse.ArgumentParser()
 
 
-"""One-line tree from https://gist.github.com/hrldcpr/2012250"""
-tree = lambda: collections.defaultdict(tree)
-
-
-def _flatten(d, parent_key='', sep='/'):
-  """Flatten nested dicts.
-
-  From: http://stackoverflow.com/questions/6027558/flatten-nested-python-dictionaries-compressing-keys
-  """
-  items = []
-  for k, v in d.items():
-    new_key = parent_key + sep + k if parent_key else k
-    if isinstance(v, collections.MutableMapping):
-      items.extend(_flatten(v, new_key, sep=sep).items())
-    else:
-      items.append((new_key, v))
-  return dict(items)
-
-def _default_to_regular(d):
-  """Convert defaultdict to regular dict to throw KeyErrors."""
-  if isinstance(d, collections.defaultdict):
-    d = {k: _default_to_regular(v) for k, v in d.iteritems()}
-  return d
-
-
-def _define_helper(arg_name, default_value, docstring, argtype):
-  """Registers 'arg_name' with 'default_value' and 'docstring'."""
-  _GLOBAL_PARSER.add_argument("--" + arg_name,
-                              default=default_value,
-                              help=docstring,
-                              type=argtype)
-
-
 class Config(object):
-  """Stores and retrieves configuration.
-
-  Light wrapper around argparse, mostly taken from:
-  https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/platform/flags.py
-
-  Custom lookup: if key doesn't exist at the lowest level, pop up a level.
-  """
-  def __init__(self, dct=None):
-    self._scope = None
-    self._path = lambda s: self._scope + '/' + s if self._scope else s
-    if dct is not None:
-      self._tree = dct
-      self.parsed = True
+  def __init__(self, yaml_path=None, dictionary=None, parsed=False):
+    self._parsed = parsed
+    assert yaml_path is None or dictionary is None
+    if yaml_path is not None:
+      with open(yaml_path, 'r') as f:
+        config = PathDict(yaml.load(f))
+    elif dictionary is not None:
+      config = PathDict(dictionary)
     else:
-      self._tree = tree()
-      self.parsed = False
+      raise Exception('Must provide dictionary or path to yaml config!')
+    self._config = _replace_variables(config)
+    if not self._parsed:
+      self._add_arguments()
+      self._parse_args()
 
-  def __getitem__(self, key):
-    if not self.parsed:
-      self.parse_args()
-    path = self._path(key)
-    path = path.split('/')
-    leaf_key = path[-1]
-    while True:
-      path.pop(-1)
-      tree = self._tree
-      for node in path:
-        tree = tree[node]
-      if leaf_key in tree:
-        return tree[leaf_key]
-      if len(path) == 0:
-        raise KeyError("Parameter %s Not Found" % key)
+  def from_yaml(yaml_path):
+    self._config = _replace_variables(config)
 
-  def __str__(self):
-    return json.dumps(self._tree, sort_keys=True, indent=2)
+  def _add_arguments(self):
+    for path in _walk(self._config):
+      default_value = path.pop()
+      arg_name = '/'.join(path)
+      _add_argument(_GLOBAL_PARSER, arg_name, default_value)
 
-  @property
-  def json(self):
-    return self._tree
-
-  @contextlib.contextmanager
-  def scope(self, scope_name):
-    self._scope = scope_name
-    yield
-    self._scope = None
-
-  def update(self, dictionary):
-    flat = _flatten(dictionary)
-    for key, value in flat.items():
-      self._set_value(key, value, update=True)
-
-  def _set_value(self, arg_name, value, update=False):
-    path = arg_name.split('/')
-    leaf_key = path.pop()
-    tree = self._tree
-    for node in path:
-      tree = tree[node]
-    if update and leaf_key not in tree:
-      raise KeyError(
-          'Key: %s not in config so it cannot be updated.' % leaf_key)
-    else:
-      tree[leaf_key] = value
-
-  def copy(self):
-    return Config(copy.deepcopy(self._tree))
-
-  def parse_args(self):
+  def _parse_args(self):
     result, unparsed = _GLOBAL_PARSER.parse_known_args()
     for arg_name, val in vars(result).items():
-      self._set_value(arg_name, val)
-    self.parsed = True
-    self._tree = _default_to_regular(self._tree)
+      self._config[arg_name] = val
+    self._parsed = True
     if unparsed and unparsed != ['test']:
       raise Warning('Unparsed args: %s' % unparsed)
 
-  def define_string(self, arg_name, default_value, docstring):
-    """defines an arg of type 'string'.
-    Args:
-      arg_name: The name of the arg as a string.
-      default_value: The default value the arg should take as a string.
-      docstring: A helpful message explaining the use of the arg.
-    """
-    arg_name = self._path(arg_name)
-    _define_helper(arg_name, default_value, docstring, str)
+  def __getitem__(self, key):
+    return self._config[key]
+
+  def __setitem__(self, key, value):
+    self._config[key] = value
+
+  def update(self, dictionary):
+    dictionary = PathDict(dictionary)
+    dictionary = _replace_variables(dictionary)
+    for key, value in dictionary.items():
+      self._config[key] = value
+
+  def copy(self):
+    return copy.deepcopy(self)
+
+  def __str__(self):
+    return yaml.dump(dict(self._config), default_flow_style=False)
+
+  def update_from_yaml(self, path):
+    with open(path, 'r') as f:
+      config = PathDict(yaml.load(f))
+    config = _replace_variables(config)
+    for path in _walk(config):
+      value = path.pop()
+      key = '/'.join(path)
+      try:
+        self[key] = value
+      except KeyError:
+        print('Warning: no key %s in config. Not updated!' % key)
 
 
-  def define_integer(self, arg_name, default_value, docstring):
-    """defines an arg of type 'int'.
-    Args:
-      arg_name: The name of the arg as a string.
-      default_value: The default value the arg should take as an int.
-      docstring: A helpful message explaining the use of the arg.
-    """
-    arg_name = self._path(arg_name)
-    _define_helper(arg_name, default_value, docstring, int)
+def _walk(dictionary, key_path=[]):
+  """Iterate through a nested dictionary."""
+  for key, value in dictionary.items():
+    if isinstance(value, dict):
+      for path in _walk(value, key_path=[key]):
+        yield path
+    else:
+      yield key_path + [key, value]
 
 
-  def define_boolean(self, arg_name, default_value, docstring):
-    """defines an arg of type 'boolean'.
-    Args:
-      arg_name: The name of the arg as a string.
-      default_value: The default value the arg should take as a boolean.
-      docstring: A helpful message explaining the use of the arg.
-    """
-    arg_name = self._path(arg_name)
-    # Register a custom function for 'bool' so --arg=True works.
+def _replace_variables(dictionary):
+  assert isinstance(dictionary, PathDict)
+  for path in _walk(dictionary):
+    value = path.pop()
+    if isinstance(value, str) and value.startswith('$'):
+      value = os.environ[value[1:]]
+    key = '/'.join(path)
+    dictionary[key] = value
+  return dictionary
+
+
+def _add_argument(parser, arg_name, default_value):
+  """Add arguments to the global parser. Null values inferred as strings."""
+  if isinstance(default_value, bool):
     def str2bool(v):
       return v.lower() in ('true', 't', '1')
-    _GLOBAL_PARSER.add_argument('--' + arg_name,
-                                nargs='?',
-                                const=True,
-                                help=docstring,
-                                default=default_value,
-                                type=str2bool)
-
-    # Add negated version, stay consistent with argparse with regard to
-    # dashes in arg names.
-    _GLOBAL_PARSER.add_argument('--no' + arg_name,
-                                action='store_false',
-                                dest=arg_name.replace('-', '_'))
-
-  def define_float(self, arg_name, default_value, docstring):
-    """defines an arg of type 'float'.
-    Args:
-      arg_name: The name of the arg as a string.
-      default_value: The default value the arg should take as a float.
-      docstring: A helpful message explaining the use of the arg.
-    """
-    arg_name = self._path(arg_name)
-    _define_helper(arg_name, default_value, docstring, float)
-
-  def define_list(self, arg_name, default_value, docstring):
-    """defines an arg of type 'list'.
-    Args:
-      arg_name: The name of the arg as a string.
-      default_value: The default value the arg should take as a float.
-      docstring: A helpful message explaining the use of the arg.
-    """
-    arg_name = self._path(arg_name)
-    self._set_value(arg_name, default_value)
+    parser.add_argument('--' + arg_name,
+                        nargs='?',
+                        const=True,
+                        default=default_value,
+                        type=str2bool)
+  elif default_value == None:
+    parser.add_argument('--' + arg_name,
+                        nargs='?',
+                        const=True,
+                        default=None,
+                        type=str)
+  else:
+    parser.add_argument('--' + arg_name,
+                        default=default_value,
+                        nargs='?',
+                        const=True,
+                        type=type(default_value))

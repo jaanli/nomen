@@ -1,0 +1,14 @@
+learning_rate: &learning_rate !!float 1e-3
+model:
+  learning_rate: 0.2
+
+variational:
+  learning_rate: *learning_rate
+
+first_house:
+  windows: &windows true
+second_house:
+  windows: *windows
+
+dat: $DAT
+log: $LOG

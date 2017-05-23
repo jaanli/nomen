@@ -18,22 +18,22 @@ from setuptools import find_packages
 ##########################################################################
 
 ## Basic information
-NAME         = "nomen"
-DESCRIPTION  = "Light command line flags and option / parameter tree"
-AUTHOR       = "Jaan Altosaar"
-EMAIL        = "j@jaan.io"
-LICENSE      = "MIT"
-REPOSITORY   = "https://github.com/altosaar/nomen"
-PACKAGE      = "nomen"
+NAME = "nomen"
+DESCRIPTION = "YAML configuration tree with command line flags."
+AUTHOR = "Jaan Altosaar"
+EMAIL = "j@jaan.io"
+LICENSE = "MIT"
+REPOSITORY = "https://github.com/altosaar/nomen"
+PACKAGE = "nomen"
 
 ## Define the keywords
-KEYWORDS     = (
+KEYWORDS = (
     'nomen', 'python', 'option', 'tree', 'nested', 'dict', 'parameter', 'flags'
 )
 
 ## Define the classifiers
 ## See https://pypi.python.org/pypi?%3Aaction=list_classifiers
-CLASSIFIERS  = (
+CLASSIFIERS = (
     'Development Status :: 4 - Beta',
     'Environment :: Console',
     'License :: OSI Approved :: Apache Software License',
@@ -44,17 +44,18 @@ CLASSIFIERS  = (
 )
 
 ## Important Paths
-PROJECT      = os.path.abspath(os.path.dirname(__file__))
+PROJECT = os.path.abspath(os.path.dirname(__file__))
 VERSION_PATH = os.path.join(PACKAGE, "version.py")
 
 ## Directories to ignore in find_packages
-EXCLUDES     = (
+EXCLUDES = (
     "tests", "bin", "docs", "fixtures", "register", "notebooks",
 )
 
 ##########################################################################
 ## Helper Functions
 ##########################################################################
+
 
 def read(*parts):
     """

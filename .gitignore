@@ -10,3 +10,6 @@
 
 # Vim swap
 *.swp
+
+# Cache
+.cache/
