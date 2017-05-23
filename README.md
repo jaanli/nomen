@@ -3,7 +3,7 @@ Lightweight configuration with command line flags.
 
 Define a configuration with YAML syntax and any environment variables:
 
-In file `config.yml':
+In file `config.yml`:
 ```
 model:
   learning_rate: 0.1
@@ -30,7 +30,8 @@ print('Eval options', cfg['eval_data'])
 ```
 
 Configurations define command line arguments:
-```python main.py \
+```
+python main.py \
 	--model/learning_rate 0.001 \
 	--log /tmp \
 	--model/turbo
