@@ -1,5 +1,5 @@
 # nomen
-Lightweight configuration with command line flags.
+[Nomen](https://en.wikipedia.org/wiki/Nomen_nudum) or _nomen nudum_ means _naked name_ in taxonomy. The goal of this package is to provide python programs with highly-readable, minimalist configuration and command line flags based on YAML syntax.
 
 Define a configuration with YAML syntax and any environment variables:
 
@@ -37,7 +37,6 @@ python main.py \
 	--model/turbo
 ```
 
-[Nomen](https://en.wikipedia.org/wiki/Nomen_nudum) or _nomen nudum_ means _naked name_ in taxonomy. The goal of this package is to provide transparent configuration and command line flags.
 
 ### Install
 ```
