@@ -1,5 +1,5 @@
 # nomen
-[Nomen](https://en.wikipedia.org/wiki/Nomen_nudum) or _nomen nudum_ means _naked name_ in taxonomy. The goal of this package is to provide python programs with highly-readable, minimalist configuration and command line flags based on YAML syntax.
+[Nomen](https://en.wikipedia.org/wiki/Nomen_nudum) :goat: or _nomen nudum_ means _naked name_ in taxonomy. The goal of this package is to provide python programs with highly-readable, minimalist configuration and command line flags based on YAML syntax.
 
 Define a configuration with YAML syntax and any environment variables:
 
