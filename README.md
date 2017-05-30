@@ -74,7 +74,7 @@ Many thanks to Rajesh - this is based around his advice and ideas, which I've fo
 Pull requests and issues welcome. Please help
 
 ### Wishlist / todo
-* do not subclass from dict for pathdict
+* do not subclass from dict for pathdict. Composition over inheritance!
 * when indexing subtree, return a pathdict!
 * think about jinja2 templates? i.e. to merge multiple files? e.g. << ./global_config.yml
 * make global options work?
