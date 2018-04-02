@@ -12,3 +12,4 @@ second_house:
 
 dat: $DAT
 log: $LOG
+long_path: $DAT/test_directory/some_file.csv

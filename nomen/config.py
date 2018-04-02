@@ -90,7 +90,10 @@ def _replace_variables(dictionary):
   for path in _walk(dictionary):
     value = path.pop()
     if isinstance(value, str) and value.startswith('$'):
-      value = os.environ[value[1:]]
+      file_path = value[1:].split('/')
+      env_var = file_path.pop(0)
+      expanded = os.environ[env_var]
+      value = os.path.join(expanded, '/'.join(file_path))
     key = '/'.join(path)
     dictionary[key] = value
   return dictionary

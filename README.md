@@ -49,7 +49,7 @@ pip install nomen
 ### Testing
 ```
 # create a symbolic link to the package for testing
-pip install -e i
+pip install -e .
 # run all the tests
 pytest
 ```

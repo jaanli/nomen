@@ -18,10 +18,11 @@ def test_set_get():
 
 
 def test_environment_variables():
-  os.environ['TMP'] = '/tmp'
+  os.environ['TMP'] = '/tmp/'
   tmp_cfg = cfg.copy()
   tmp_cfg.update({'TMP': '$TMP'})
   print(str(tmp_cfg))
+  assert tmp_cfg['TMP'] == '/tmp/'
 
 
 if __name__ == '__main__':
