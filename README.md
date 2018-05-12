@@ -79,3 +79,4 @@ Pull requests and issues welcome. Please help
 * think about jinja2 templates? i.e. to merge multiple files? e.g. << ./global_config.yml
 * make global options work?
 * be able to iterate through dict?
+* currently values containing environment variables are expanded. We should also store them as pathlib.Path's!
