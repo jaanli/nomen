@@ -80,3 +80,4 @@ Pull requests and issues welcome. Please help
 * make global options work?
 * be able to iterate through dict?
 * currently values containing environment variables are expanded. We should also store them as pathlib.Path's!
+* nomen.Config cannot be run in ipython, with %run example_script.py; because argparse args cannot be redefined. need to find a fix
