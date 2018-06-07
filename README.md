@@ -39,6 +39,12 @@ python main.py \
 	--model/turbo
 ```
 
+Configurations are portable - save and load using yaml:
+```
+with open('config.yml', 'w') as f:
+  f.write(str(cfg))
+```
+
 
 ### Install
 ```
