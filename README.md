@@ -28,6 +28,7 @@ File `main.py`
 import nomen
 cfg = nomen.Config('config.yml')
 print('Model options', cfg['model'])
+print('Model learning rate', cfg.model.learning_rate)
 print('Eval options', cfg['eval_data'])
 ```
 
@@ -74,10 +75,4 @@ Many thanks to Rajesh - this is based around his advice and ideas, which I've fo
 Pull requests and issues welcome. Please help
 
 ### Wishlist / todo
-* do not subclass from dict for pathdict. Composition over inheritance!
-* when indexing subtree, return a pathdict!
-* think about jinja2 templates? i.e. to merge multiple files? e.g. << ./global_config.yml
-* make global options work?
-* be able to iterate through dict?
-* currently values containing environment variables are expanded. We should also store them as pathlib.Path's!
-* nomen.Config cannot be run in ipython, with %run example_script.py; because argparse args cannot be redefined. need to find a fix
+* How to design global options? In yaml?

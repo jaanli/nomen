@@ -1,34 +1,31 @@
 import yaml
-from .path_dict import PathDict
-import os
 import argparse
 import itertools
 import collections
 import copy
 import json
+import pathlib
+import addict
 
 
 _GLOBAL_PARSER = argparse.ArgumentParser()
 
 
 class Config(object):
-  def __init__(self, yaml_path=None, dictionary=None, parsed=False):
-    self._parsed = parsed
+  """Create addict from yaml or dict; maybe create command-line flags."""
+  def __init__(self, yaml_path=None, dictionary=None, make_flags=True):
     assert yaml_path is None or dictionary is None
     if yaml_path is not None:
       with open(yaml_path, 'r') as f:
-        config = PathDict(yaml.load(f))
+        config = addict.Dict(yaml.load(f))
     elif dictionary is not None:
-      config = PathDict(dictionary)
+      config = addict.Dict(dictionary)
     else:
-      raise Exception('Must provide dictionary or path to yaml config!')
+      raise Exception("One of {yaml_path, dictionary} must be provided!")
     self._config = _replace_variables(config)
-    if not self._parsed:
+    if make_flags:
       self._add_arguments()
       self._parse_args()
-
-  def from_yaml(yaml_path):
-    self._config = _replace_variables(config)
 
   def _add_arguments(self):
     for path in _walk(self._config):
@@ -37,42 +34,35 @@ class Config(object):
       _add_argument(_GLOBAL_PARSER, arg_name, default_value)
 
   def _parse_args(self):
-    result, unparsed = _GLOBAL_PARSER.parse_known_args()
+    result, unparsed_args = _GLOBAL_PARSER.parse_known_args()
     for arg_name, val in vars(result).items():
-      self._config[arg_name] = val
-    self._parsed = True
-    if unparsed and unparsed != ['test']:
-      raise Warning('Unparsed args: %s' % unparsed)
+      path = arg_name.split("/")
+      last_key = path.pop()
+      cfg = self._config
+      for key in path:
+        cfg = cfg[key]
+      cfg[last_key] = val
+    if unparsed_args and unparsed_args != ['test']:
+      raise Warning('Unparsed args: %s' % unparsed_args)
 
+  def __getattr__(self, item):
+    return self._config.__getattr__(item)
+  
   def __getitem__(self, key):
-    return self._config[key]
+    return self._config.__getitem__(key)
 
-  def __setitem__(self, key, value):
-    self._config[key] = value
+  def __setitem__(self, name, value):
+    self._config.__setitem__(name, value)
 
-  def update(self, dictionary):
-    dictionary = PathDict(dictionary)
-    dictionary = _replace_variables(dictionary)
-    for key, value in dictionary.items():
-      self._config[key] = value
-
-  def copy(self):
-    return copy.deepcopy(self)
+  def __setattr__(self, name, value):
+    if name == '_config':
+      self.__dict__[name] = value
+    else:
+      self._config.__setattr__(name, value)
+    
 
   def __str__(self):
-    return yaml.dump(dict(self._config), default_flow_style=False)
-
-  def update_from_yaml(self, path):
-    with open(path, 'r') as f:
-      config = PathDict(yaml.load(f))
-    config = _replace_variables(config)
-    for path in _walk(config):
-      value = path.pop()
-      key = '/'.join(path)
-      try:
-        self[key] = value
-      except KeyError:
-        print('Warning: no key %s in config. Not updated!' % key)
+    return yaml.dump(self._config.to_dict(), default_flow_style=False)
 
 
 def _walk(dictionary, key_path=[]):
@@ -86,16 +76,21 @@ def _walk(dictionary, key_path=[]):
 
 
 def _replace_variables(dictionary):
-  assert isinstance(dictionary, PathDict)
+  """Replace environment variables in a nested dict."""
   for path in _walk(dictionary):
     value = path.pop()
     if isinstance(value, str) and value.startswith('$'):
       file_path = value[1:].split('/')
       env_var = file_path.pop(0)
-      expanded = os.environ[env_var]
-      value = os.path.join(expanded, '/'.join(file_path))
+      expanded = pathlib.os.environ[env_var]
+      value = pathlib.os.path.join(expanded, '/'.join(file_path))
+      value = pathlib.Path(value)
     key = '/'.join(path)
-    dictionary[key] = value
+    last_key = path.pop()
+    sub_dict = dictionary
+    for key in path:
+      sub_dict = sub_dict[key]
+    sub_dict[last_key] = value
   return dictionary
 
 

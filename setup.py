@@ -53,7 +53,7 @@ EXCLUDES = (
 )
 
 ## Requirements
-REQUIREMENTS = ["pyyaml"]
+REQUIREMENTS = ["pyyaml", "addict"]
 
 ##########################################################################
 ## Helper Functions

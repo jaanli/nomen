@@ -10,6 +10,6 @@ first_house:
 second_house:
   windows: *windows
 
-dat: $DAT
-log: $LOG
-long_path: $DAT/test_directory/some_file.csv
+dat: $TMP
+log: $TMP
+long_path: $TMP/test_directory/some_file.csv

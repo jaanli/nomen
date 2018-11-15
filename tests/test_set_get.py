@@ -1,29 +1,19 @@
-import pytest
-from importlib import reload
+import nomen
 import os
-import json
+import pathlib
 
 
-from util import cfg
+from util import get_path
 
 
 def test_set_get():
-  assert cfg['model/learning_rate'] == 0.2
-  cfg['model']['learning_rate'] = 2.
-  assert cfg['model/learning_rate'] == 2.
-  cfg['model/learning_rate'] = 0.1
-  assert cfg['model/learning_rate'] == 0.1
-  cfg.update({'model': {'learning_rate': 100.}})
-  assert cfg['model/learning_rate'] == 100.
+  os.environ["TMP"] = "/tmp"
+  cfg = nomen.Config(yaml_path=get_path("config.yml"), make_flags=False)
+  assert cfg['model']['learning_rate'] == 0.2
+  assert cfg.model.learning_rate == 0.2
+  cfg.model.learning_rate = 42.
+  assert cfg.model.learning_rate == 42.
 
-
-def test_environment_variables():
-  os.environ['TMP'] = '/tmp/'
-  tmp_cfg = cfg.copy()
-  tmp_cfg.update({'TMP': '$TMP'})
-  print(str(tmp_cfg))
-  assert tmp_cfg['TMP'] == '/tmp/'
-
-
+  
 if __name__ == '__main__':
-  test_environment_variables()
+  test_set_get()
