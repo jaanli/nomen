@@ -40,11 +40,20 @@ python main.py \
 	--model/turbo
 ```
 
+Configurations are portable - save and load using yaml:
+```
+with open('config.yml', 'w') as f:
+  f.write(str(cfg))
+```
+
 
 ### Install
 ```
 pip install nomen
 ```
+
+### Reasons for not using
+It is easy to write subtle bugs with YAML parsing a boolean incorrectly. c.f. [problems with YAML](https://arp242.net/weblog/yaml_probably_not_so_great_after_all.html). TODO: switch `load` to `safe_load`. Consider switching to StrictYAML.
 
 
 ### Testing
