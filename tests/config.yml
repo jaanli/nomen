@@ -13,3 +13,5 @@ second_house:
 dat: $TMP
 log: $TMP
 long_path: $TMP/test_directory/some_file.csv
+
+list: [3, 4, 10]

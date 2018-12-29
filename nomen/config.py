@@ -13,28 +13,20 @@ _GLOBAL_PARSER = argparse.ArgumentParser()
 
 class Config(object):
   """Create addict from yaml or dict; maybe create command-line flags."""
-  def __init__(self, yaml_path=None, dictionary=None, make_flags=True):
-    assert yaml_path is None or dictionary is None
-    if yaml_path is not None:
-      with open(yaml_path, 'r') as f:
-        config = addict.Dict(yaml.load(f))
-    elif dictionary is not None:
-      config = addict.Dict(dictionary)
-    else:
-      raise Exception("One of {yaml_path, dictionary} must be provided!")
+  def __init__(self, dictionary, make_args=True):
+    config = addict.Dict(dictionary)
     self._config = _replace_variables(config)
-    if make_flags:
-      self._add_arguments()
-      self._parse_args()
+    if make_args:
+      self._add_args()
 
-  def _add_arguments(self):
+  def _add_args(self):
     for path in _walk(self._config):
       default_value = path.pop()
       arg_name = '/'.join(path)
       _add_argument(_GLOBAL_PARSER, arg_name, default_value)
 
-  def _parse_args(self):
-    result, unparsed_args = _GLOBAL_PARSER.parse_known_args()
+  def parse_args(self, args=None):
+    result, unparsed_args = _GLOBAL_PARSER.parse_known_args(args)
     for arg_name, val in vars(result).items():
       path = arg_name.split("/")
       last_key = path.pop()
@@ -59,7 +51,6 @@ class Config(object):
       self.__dict__[name] = value
     else:
       self._config.__setattr__(name, value)
-    
 
   def __str__(self):
     return yaml.dump(self._config.to_dict(), default_flow_style=False)
@@ -110,6 +101,12 @@ def _add_argument(parser, arg_name, default_value):
                         const=True,
                         default=None,
                         type=str)
+  elif type(default_value) == list:
+    parser.add_argument('--' + arg_name,
+                        nargs='+',
+                        const=None,
+                        default=default_value,
+                        type=type(default_value[0]))
   else:
     parser.add_argument('--' + arg_name,
                         default=default_value,
