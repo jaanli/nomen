@@ -85,3 +85,4 @@ Pull requests and issues welcome. Please help
 
 ### Wishlist / todo
 * How to design global options? In yaml?
+* Bugs happen due to addict creating attributes that may not exist. Is there a way to freeze addict to a specific set of attributes?
