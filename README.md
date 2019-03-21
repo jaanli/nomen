@@ -27,6 +27,7 @@ File `main.py`
 ```
 import nomen
 cfg = nomen.Config('config.yml')
+cfg.parse_args()
 print('Model options', cfg['model'])
 print('Model learning rate', cfg.model.learning_rate)
 print('Eval options', cfg['eval_data'])
