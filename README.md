@@ -79,7 +79,7 @@ pip install nomen --no-cache-dir
 
 
 ### Acknowledgments
-Many thanks to Rajesh - this is based around his advice and ideas, which I've found it very useful.
+Many thanks to Rajesh - this is based around his advice and ideas, which I've found it very useful. Many props to Bharat for helping subclass addict.Dict in the proper way and providing proper support.
 
 ### Contributing
 Pull requests and issues welcome. Please help
