@@ -1,26 +1,31 @@
 import yaml
 import argparse
-import itertools
-import collections
-import copy
 import json
 import pathlib
 import addict
+import os
+import json
 
 
 _GLOBAL_PARSER = argparse.ArgumentParser()
 
 
-class Config(object):
+class MyAddict(addict.Dict):
+  def __missing__(self, name):
+    raise AttributeError(f'Attribute "{name}" does not exist!')
+
+
+class Config(MyAddict):
   """Create addict from yaml or dict; maybe create command-line flags."""
   def __init__(self, dictionary, make_args=True):
-    config = addict.Dict(dictionary)
-    self._config = _replace_variables(config)
+    super()
+    dictionary = _replace_variables(dictionary)
+    self.update(MyAddict(dictionary))
     if make_args:
       self._add_args()
 
   def _add_args(self):
-    for path in _walk(self._config):
+    for path in _walk(self):
       default_value = path.pop()
       arg_name = '/'.join(path)
       _add_argument(_GLOBAL_PARSER, arg_name, default_value)
@@ -30,30 +35,31 @@ class Config(object):
     for arg_name, val in vars(result).items():
       path = arg_name.split("/")
       last_key = path.pop()
-      cfg = self._config
+      cfg = self
       for key in path:
         cfg = cfg[key]
       cfg[last_key] = val
     if unparsed_args and unparsed_args != ['test']:
       raise Warning('Unparsed args: %s' % unparsed_args)
 
-  def __getattr__(self, item):
-    return self._config.__getattr__(item)
-  
-  def __getitem__(self, key):
-    return self._config.__getitem__(key)
+  def update(self, *args, **kwargs):
+    super().update(*args, **kwargs)
+    self = _replace_variables(self)
 
-  def __setitem__(self, name, value):
-    self._config.__setitem__(name, value)
-
-  def __setattr__(self, name, value):
-    if name == '_config':
-      self.__dict__[name] = value
-    else:
-      self._config.__setattr__(name, value)
-
-  def __str__(self):
-    return yaml.dump(self._config.to_dict(), default_flow_style=False)
+  def __repr__(self):
+    """Convert values that are paths into strings (otherwise yaml complains)."""
+    dictionary = self.to_dict()
+    for path in _walk(dictionary):
+      value = path.pop()    
+      if isinstance(value, pathlib.Path):
+        value = str(value)
+      last_key = path.pop()
+      sub_dict = dictionary
+      for key in path:
+        sub_dict = sub_dict[key]
+      sub_dict[last_key] = value
+    tmp = json.loads(json.dumps(dictionary))
+    return yaml.dump(tmp, default_flow_style=False)
 
 
 def _walk(dictionary, key_path=[]):
@@ -65,18 +71,22 @@ def _walk(dictionary, key_path=[]):
     else:
       yield key_path + [key, value]
 
+      
+def _ispath(string):
+  """Check if a string is a directory."""
+  if string.startswith('$') or string.startswith('/'):
+    return True
+  else:
+    return False
 
+  
 def _replace_variables(dictionary):
   """Replace environment variables in a nested dict."""
   for path in _walk(dictionary):
     value = path.pop()
-    if isinstance(value, str) and value.startswith('$'):
-      file_path = value[1:].split('/')
-      env_var = file_path.pop(0)
-      expanded = pathlib.os.environ[env_var]
-      value = pathlib.os.path.join(expanded, '/'.join(file_path))
+    if isinstance(value, str) and _ispath(value):
+      value = os.path.expandvars(value)
       value = pathlib.Path(value)
-    key = '/'.join(path)
     last_key = path.pop()
     sub_dict = dictionary
     for key in path:

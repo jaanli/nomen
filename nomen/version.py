@@ -5,4 +5,4 @@
 
 
 def get_version():
-  return '0.42'
+  return '0.5'
