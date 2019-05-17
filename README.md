@@ -27,6 +27,7 @@ File `main.py`
 ```
 import nomen
 cfg = nomen.Config('config.yml')
+cfg.parse_args()
 print('Model options', cfg['model'])
 print('Model learning rate', cfg.model.learning_rate)
 print('Eval options', cfg['eval_data'])
@@ -85,3 +86,5 @@ Pull requests and issues welcome. Please help
 
 ### Wishlist / todo
 * How to design global options? In yaml?
+* Bugs happen due to addict creating attributes that may not exist. Is there a way to freeze addict to a specific set of attributes? Or throw an error when returning an empty dictionary? Idea: check if empty dict is returned, then throw an error.
+* Fix pathlib.Path creation for keys with values starting with `$` or `/`
