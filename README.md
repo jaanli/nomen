@@ -7,6 +7,16 @@ Define a configuration with YAML syntax and any environment variables:
 
 In file `config.yml`:
 ```
+
+```
+
+Use the configuration!
+
+File `main.py`
+```
+import yaml
+import nomen
+"""
 model:
   learning_rate: 0.1
   turbo: false
@@ -19,14 +29,8 @@ eval_data:
   shape: *shape
 
 log: $LOG  ## will be replaced by the $LOG environment variable
-```
-
-Use the configuration!
-
-File `main.py`
-```
-import nomen
-cfg = nomen.Config('config.yml')
+"""
+cfg = nomen.Config(yaml.safe_load('config.yml'))
 cfg.parse_args()
 print('Model options', cfg['model'])
 print('Model learning rate', cfg.model.learning_rate)
