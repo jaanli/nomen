@@ -5,13 +5,6 @@
 
 Define a configuration with YAML syntax and any environment variables:
 
-In file `config.yml`:
-```
-
-```
-
-Use the configuration!
-
 File `main.py`
 ```
 import yaml
