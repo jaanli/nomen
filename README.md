@@ -1,7 +1,7 @@
 # nomen
 [![Build Status](https://travis-ci.org/altosaar/nomen.svg?branch=master)](https://travis-ci.org/altosaar/nomen)
 
-[Nomen](https://en.wikipedia.org/wiki/Nomen_nudum) :goat: or _nomen nudum_ means _naked name_ in taxonomy. The goal of this package is to provide python programs with highly-readable, minimalist configuration and command line flags based on YAML syntax.
+[Nomen](https://en.wikipedia.org/wiki/Nomen_nudum) or _nomen nudum_ means _naked name_ in taxonomy. The goal of this package is to provide python programs with highly-readable, minimalist configuration and command line flags based on YAML syntax. The main difference compared to the standard argparse library is that a nomen configuration file and and command line flag definition are the same thing. This means defining command line flags is less verbose.  
 
 Define a configuration with YAML syntax and any environment variables:
 
@@ -86,3 +86,4 @@ Pull requests and issues welcome. Please help
 
 ### Wishlist / todo
 * How to design global options? In yaml?
+* 
